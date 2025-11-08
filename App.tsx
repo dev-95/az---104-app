@@ -23,6 +23,7 @@ const App: React.FC = () => {
   const [score, setScore] = useState(0);
   const [error, setError] = useState<string | null>(null);
   const [examAnswers, setExamAnswers] = useState<UserAnswer[]>([]);
+  const [practiceAnswers, setPracticeAnswers] = useState<UserAnswer[]>([]);
   const [currentTopic, setCurrentTopic] = useState<string | null>(null);
   const [timer, setTimer] = useState(0);
 
@@ -145,6 +146,7 @@ const App: React.FC = () => {
       setScore(0);
       setCurrentQuestionIndex(0);
       setExamAnswers([]);
+      setPracticeAnswers([]);
       setGameState('quiz');
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'An unknown error occurred.';
@@ -158,6 +160,11 @@ const App: React.FC = () => {
     
     if (appMode === 'practice') {
         if (isCorrect) setScore(prev => prev + 1);
+        setPracticeAnswers(prev => [...prev, {
+            question: questions[currentQuestionIndex],
+            selectedAnswerIndex: selectedIndex,
+            isCorrect: isCorrect,
+        }]);
         setUserStats(prev => {
             const newTotalCorrect = prev.totalCorrect + (isCorrect ? 1 : 0);
             const newTotalAnswered = prev.totalAnswered + 1;
@@ -210,6 +217,8 @@ const App: React.FC = () => {
     setError(null);
     setCurrentTopic(null);
     setTimer(0);
+    setExamAnswers([]);
+    setPracticeAnswers([]);
   }, []);
 
   const handleNav = (target: GameState) => {
@@ -282,6 +291,7 @@ const App: React.FC = () => {
             score={score}
             totalQuestions={questions.length}
             onRestart={restartGame}
+            answers={practiceAnswers}
           />
         );
       default:
